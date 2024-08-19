@@ -223,30 +223,92 @@ def main():
             if not const_epoch and ((monitor_loss(loss_list0) and monitor_loss(loss_list1))):
                 epoch_size = epoch
                 break
-        def RF_Predict(train_x, test_x, train_y,special_id):
+    
+        def get_full_encode(data, dec, device = torch.device("cpu")):
+            full_x = []
+            for i in range(len(data)):
+                d = data[i]
+                q = dec.encoder(d).detach().cpu().numpy()
+                full_x.append(q)
+            return np.array(full_x)
+            
+        def RF_Predict(train_x, test_x, train_y):
             rf_model = RandomForestRegressor()
             rf_model.fit(train_x, train_y)
             rf_result = rf_model.predict(test_x)
-            kkk=[]
-            for id in special_id:
-                kkk.append(rf_result[id])
-            print(kkk)
-        def test_represention():
-            if dec == None:
-                full_x = data.cpu()
-            elif cluster:
-                dec.update()
-                full_x = get_full_cluster(data, dec, device)
-            else:
-                full_x = get_full_encode(data, dec, device)
+            with open("./result.csv","w") as f:
+                for y in rf_result:
+                    f.write(str(y) + '\n')
         
+        def test_represention():
+            full_x = get_full_encode(data, dec, device)
             train_x = full_x[train_id]
             train_y = full_y[train_id]
         
             RF_Predict(train_x, full_x, train_y, special_ids)
 
         test_represention()
-        return None
+        def prob_cover():
+            add_id = []
+            X_encoder0 = get_full_encode(data0, dec0)
+            X_encoder1 = get_full_encode(data1, dec1)
+            X_encoder = np.concatenate((X_encoder0, X_encoder1), axis=1)
+
+            kmeans = KMeans(n_clusters=n_clusters)
+            kmeans.fit(X_encoder)
+            labels = kmeans.labels_
+            centroids = kmeans.cluster_centers_
+            distances = pairwise_distances(X_encoder, centroids, metric='euclidean')
+            avg_distances = np.zeros(n_clusters)
+            for i in range(n_clusters):
+                cluster_points = X_encoder[labels == i]
+                cluster_distances = distances[labels == i, i]
+                avg_distances[i] = np.mean(cluster_distances)
+            judge_dis = np.mean(avg_distances)
+            print(judge_dis)
+
+            coverd_set = set([])
+            for train_id in train_idx:
+                for j in range(len(X_encoder)):
+                    X = X_encoder[train_id]
+                    Xx = X_encoder[j]
+                    l2_distance = np.linalg.norm(X - Xx)
+                    if l2_distance < judge_dis:
+                        coverd_set.add(j)
+
+            degree = [0 for i in range(len(X_encoder))]
+            for test_id in test_idx:
+                for j in range(len(X_encoder)):
+                    if j not in coverd_set:
+                        X = X_encoder[test_id]
+                        Xx = X_encoder[j]
+                        l2_distance = np.linalg.norm(X - Xx)
+                        if l2_distance < judge_dis:
+                            degree[test_id] += 1
+            
+            for idx in range(step_size):
+                query_idx = degree.index(max(degree))
+                add_id.append(query_idx)
+                new_covered = set([])
+                for j in range(len(X_encoder)):
+                    if j not in coverd_set:
+                        X = X_encoder[query_idx]
+                        Xx = X_encoder[j]
+                        l2_distance = np.linalg.norm(X - Xx)
+                        if l2_distance < judge_dis:
+                            new_covered.add(j)
+                            coverd_set.add(j)
+                for test_id in test_idx:
+                    for newc in new_covered:
+                        X = X_encoder[test_id]
+                        Xx = X_encoder[newc]
+                        l2_distance = np.linalg.norm(X - Xx)
+                        if l2_distance < judge_dis:
+                            degree[test_id] -= 1
+                degree[query_idx] = 0
+                
+            return add_id
+        return prob_cover()
     
     data0 = torch.tensor(all_low0, dtype=torch.double).to(device)
     data1 = torch.tensor(all_low1, dtype=torch.double).to(device)
@@ -261,9 +323,9 @@ def main():
         if full_y[i] > 0:
             train_id.append(i)
     step_size = 25
-    recommend_reactions = double_cluster(dec0, dec1,data0, data1, train_id, step_size, 30, 100, dir_name)
+    recommend_reaction_ids = double_cluster(dec0,dec1,data0,data1,train_id,step_size,30,100,dir_name)
 
-    print(recommend_reactions)
+    print(recommend_reaction_ids)
 
 if __name__ == "__main__":
     main()
