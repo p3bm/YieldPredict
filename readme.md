@@ -12,8 +12,8 @@ matplotlib
 ### For Yield Prediction
 
 #### For your own dataset
-1. Prepare an xlsx file of reaction data in SMILES format according to the given style.
-2. Convert the reaction space into a binary npy file (we provide a basic molecular fingerprint conversion script in utils).
+1. Prepare an xlsx file of reaction data in SMILES format according to the given style and convert the reaction space into a binary npy file with provided script in utils.
+2. Or prepare your own molecular descriptor npz file with data store as `train_data` and yield(0-100) store as `train_label`
 3. Modify the arguments in `class Arguments` of `main.py`
 4. run `main.py` and the prediction result will be represent as `result.csv`
 
