@@ -126,9 +126,7 @@ def main():
     all_low0 = origx_trains[0]
     all_low1 = origx_trains[1]
     
-    def double_cluster(dec0, dec1, data0, data1, start_id, step_size, n_clusters = 30, al_method = 'prob'):
-        print(len(start_id))
-        
+    def double_cluster(dec0, dec1, data0, data1, start_id, step_size, n_clusters = 30, al_method = 'prob'):        
         train_idx = start_id
         test_idx = [i for i in range(len(orig_y_train_unnormalized)) if i not in start_id]
         train_id = np.array(start_id)
