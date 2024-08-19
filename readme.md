@@ -25,8 +25,8 @@ python yield_predict_real.py
 
 
 ### For performance test
-We prepare BH.py, SM.py and BH_Plus.py for performance test on these three public HTE dataset
-Download and unzip `datasets.zip` in current dir from https://drive.google.com/drive/folders/1Dioh_fcPyMbhNNtEmNyUE4TrzxMnXgkV?usp=sharing
+We prepare BH.py, SM.py and BH_Plus.py for performance test on these three public HTE dataset  
+Download and unzip `datasets.zip` in current dir from https://drive.google.com/drive/folders/1Dioh_fcPyMbhNNtEmNyUE4TrzxMnXgkV?usp=sharing  
 ```
 python BH.py
 python SM.py
