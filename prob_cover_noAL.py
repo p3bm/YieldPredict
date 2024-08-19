@@ -68,13 +68,13 @@ class DEC(nn.Module):
 
 class Arguments:
     def __init__(self):
-        self.dataset = "real_4"
+        self.dataset = "real_4"        #dataset name of your reaction space
         self.split_mode = 0
-        self.dataset_path = "./datasets/real"
+        self.dataset_path = "./datasets/"
 
-        self.representations = ['Mordred', 'morgan_fp']
-        self.reduce_method = ['pca','pca']
-        self.pca_components = [4096,4096]
+        self.representations = ['Mordred', 'morgan_fp']    #Molecular descriptors you want to use
+        self.reduce_method = ['pca','pca']    #Arguments for PCA
+        self.pca_components = [4096,4096]    
 
 def PCA_reduce(xs, n_components = 72):
     trunc_svd = TruncatedSVD(n_components = n_components)
@@ -98,11 +98,6 @@ def main():
     dataset_kwargs = dict()
     dataset_kwargs["split_mode"] = args.split_mode
     
-    current_time = datetime.datetime.now()
-    timestamp = current_time.strftime("%Y%m%d%H%M%S")
-    dir_name = f"{timestamp}"
-    os.makedirs('./figs/' + dir_name)
-
     origx_trains = []
     for i in range(len(args.representations)):
         representation = args.representations[i]
@@ -131,7 +126,7 @@ def main():
     all_low0 = origx_trains[0]
     all_low1 = origx_trains[1]
     
-    def double_cluster(dec0, dec1, data0, data1, start_id, step_size, n_clusters = 30, epoch_size = 20, dir_name = 'figs', const_epoch = False, al_method = 'prob'):
+    def double_cluster(dec0, dec1, data0, data1, start_id, step_size, n_clusters = 30, al_method = 'prob'):
         print(len(start_id))
         
         train_idx = start_id
@@ -264,21 +259,22 @@ def main():
         save_test()
         return None
     
-    def activate_learning():
-        data0 = torch.tensor(all_low0, dtype=torch.double).to(device)
-        data1 = torch.tensor(all_low1, dtype=torch.double).to(device)
-        dec0 = DEC(ori_cluster_centers = None,input_dim = data0.shape[1], hidden_dim = 2048, output_dim = 1024)
-        dec0.to(torch.double)
-        dec0.to(device)
-        dec1 = DEC(ori_cluster_centers = None,input_dim = data1.shape[1], hidden_dim = 2048, output_dim = 1024)
-        dec1.to(torch.double)
-        dec1.to(device)
-        train_id = get_split_id(len(orig_y_train_unnormalized), 0.975, 199)
-        step_size = 25
-        total_size = 199
-        double_cluster(dec0, dec1,data0, data1, train_id, step_size, 30, 100, dir_name)
+    data0 = torch.tensor(all_low0, dtype=torch.double).to(device)
+    data1 = torch.tensor(all_low1, dtype=torch.double).to(device)
+    dec0 = DEC(ori_cluster_centers = None,input_dim = data0.shape[1], hidden_dim = 2048, output_dim = 1024)
+    dec0.to(torch.double)
+    dec0.to(device)
+    dec1 = DEC(ori_cluster_centers = None,input_dim = data1.shape[1], hidden_dim = 2048, output_dim = 1024)
+    dec1.to(torch.double)
+    dec1.to(device)
+    train_id = []
+    for i in range(len(full_y)):
+        if full_y[i] > 0:
+            train_id.append(i)
+    step_size = 25
+    recommend_reactions = double_cluster(dec0, dec1,data0, data1, train_id, step_size, 30, 100, dir_name)
 
-    activate_learning()
+    print(recommend_reactions)
 
 if __name__ == "__main__":
     main()
