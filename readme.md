@@ -3,10 +3,10 @@
 
 
 ## Requrements
-pytorch
-numpy
-sklearn
-matplotlib
+pytorch  
+numpy  
+sklearn  
+matplotlib  
 
 ## Usage
 
