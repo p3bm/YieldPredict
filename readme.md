@@ -27,7 +27,6 @@ python yield_predict_real.py
 ### For performance test
 We prepare BH.py, SM.py and BH_Plus.py for performance test on these three public HTE dataset
 ```
-python prepare_dataset.py
 python BH.py
 python SM.py
 python BH_Plus.py
