@@ -3,7 +3,6 @@ import datetime
 import random
 import numpy as np
 from sklearn.decomposition import TruncatedSVD
-from myutil import *
 
 import torch
 import torch.nn as nn
@@ -68,11 +67,8 @@ class DEC(nn.Module):
 
 class Arguments:
     def __init__(self):
-        self.dataset = "real_4"        #dataset name of your reaction space
+        self.dataset_files = ["./real_6_Mordred_train.npz", "./real_6_morgan_fp_2048_train.npz"] #dataset path of your reaction space
         self.split_mode = 0
-        self.dataset_path = "./datasets/"
-
-        self.representations = ['Mordred', 'morgan_fp']    #Molecular descriptors you want to use
         self.reduce_method = ['pca','pca']    #Arguments for PCA
         self.pca_components = [4096,4096]    
 
@@ -85,6 +81,11 @@ def PCA_reduce(xs, n_components = 72):
     print("explained_variance_ratio_: {}".format(pca_explained_variance_ratio))
     return xs_reduced, trunc_svd
 
+def get_dataset(dataset):
+    data_train = np.load(dataset)
+    x_train, y_train = data_train["train_data"], data_train["train_labels"]
+    return (x_train, y_train)
+
 def main():
     cuda = torch.cuda.is_available()
     if cuda:
@@ -96,20 +97,14 @@ def main():
 
     args = Arguments()
     dataset_kwargs = dict()
-    dataset_kwargs["split_mode"] = args.split_mode
     
     origx_trains = []
-    for i in range(len(args.representations)):
-        representation = args.representations[i]
+    for i in range(len(args.dataset_files)):
+        datafile = args.dataset_files[i]
         reduce_method = args.reduce_method[i]
         pca_component = args.pca_components[i]
-        print(representation + ',' + reduce_method)
-        if representation == "morgan_fp" or representation == "morgan_pka" or representation == "morgan_pka01":
-            dataset_kwargs["representation_dim"] = 2048
-        else:
-            dataset_kwargs["representation_dim"] = None
-        original_dataset = get_dataset(args.dataset, args.dataset_path, representation, **dataset_kwargs)
-        (orig_x_train, orig_y_train_unnormalized), (orig_x_test, orig_y_test_unnormalized) = original_dataset
+        print(datafile + ',' + reduce_method)
+        (orig_x_train, orig_y_train_unnormalized) = get_dataset(datafile)
 
         num_orig_train = orig_x_train.shape[0]
         if reduce_method is not None:
@@ -126,7 +121,7 @@ def main():
     all_low0 = origx_trains[0]
     all_low1 = origx_trains[1]
     
-    def double_cluster(dec0, dec1, data0, data1, start_id, step_size, n_clusters = 30, al_method = 'prob'):        
+    def double_cluster(dec0, dec1, data0, data1, start_id, step_size, n_clusters = 30, epoch_size = 100, al_method = 'prob'):        
         train_idx = start_id
         test_idx = [i for i in range(len(orig_y_train_unnormalized)) if i not in start_id]
         train_id = np.array(start_id)
@@ -323,7 +318,7 @@ def main():
         if full_y[i] > 0:
             train_id.append(i)
     step_size = 25
-    recommend_reaction_ids = double_cluster(dec0,dec1,data0,data1,train_id,step_size,30,100,dir_name)
+    recommend_reaction_ids = double_cluster(dec0,dec1,data0,data1,train_id,step_size,30,100)
 
     print(recommend_reaction_ids)
 
