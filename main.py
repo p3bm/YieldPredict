@@ -67,7 +67,7 @@ class DEC(nn.Module):
 
 class Arguments:
     def __init__(self):
-        self.dataset_files = [] #Your npz files
+        self.dataset_files = [] #dataset path of your reaction space
         self.split_mode = 0
         self.reduce_method = ['pca','pca']    #Arguments for PCA
         self.pca_components = [4096,4096]    
@@ -85,6 +85,15 @@ def get_dataset(dataset):
     data_train = np.load(dataset)
     x_train, y_train = data_train["train_data"], data_train["train_labels"]
     return (x_train, y_train)
+
+def monitor_loss(loss_list, threshold = 0.015):
+    if len(loss_list) < 20:
+        return False
+    average_loss = sum(loss_list[-10:]) / len(loss_list[-10:])
+    previous_average_loss = sum(loss_list[-20:-10]) / len(loss_list[-20:-10])
+    if abs(average_loss - previous_average_loss) < average_loss * threshold:
+        return True
+    return False
 
 def main():
     cuda = torch.cuda.is_available()
@@ -215,38 +224,37 @@ def main():
             loss_list0.append(total_loss0.item())
             loss_list1.append(total_loss1.item())
 
-            if not const_epoch and ((monitor_loss(loss_list0) and monitor_loss(loss_list1))):
+            if ((monitor_loss(loss_list0) and monitor_loss(loss_list1))):
                 epoch_size = epoch
                 break
     
-        def get_full_encode(data, dec, device = torch.device("cpu")):
+        def get_full_encode(data, dec, device):
             full_x = []
             for i in range(len(data)):
                 d = data[i]
                 q = dec.encoder(d).detach().cpu().numpy()
                 full_x.append(q)
             return np.array(full_x)
-            
-        def RF_Predict(train_x, test_x, train_y):
-            rf_model = RandomForestRegressor()
-            rf_model.fit(train_x, train_y)
-            rf_result = rf_model.predict(test_x)
-            with open("./result.csv","w") as f:
-                for y in rf_result:
-                    f.write(str(y) + '\n')
         
-        def test_represention():
+        def test_represention(data, dec, device, name):
             full_x = get_full_encode(data, dec, device)
             train_x = full_x[train_id]
             train_y = full_y[train_id]
-        
-            RF_Predict(train_x, full_x, train_y, special_ids)
 
-        test_represention()
+            rf_model = RandomForestRegressor()
+            rf_model.fit(train_x, train_y)
+            rf_result = rf_model.predict(full_x)
+            with open(name,"w") as f:
+                for y in rf_result:
+                    f.write(str(y) + '\n')
+
+        test_represention(data0,dec0,device,'./0.csv')
+        test_represention(data1,dec1,device,'./1.csv')
+
         def prob_cover():
             add_id = []
-            X_encoder0 = get_full_encode(data0, dec0)
-            X_encoder1 = get_full_encode(data1, dec1)
+            X_encoder0 = get_full_encode(data0, dec0, device)
+            X_encoder1 = get_full_encode(data1, dec1, device)
             X_encoder = np.concatenate((X_encoder0, X_encoder1), axis=1)
 
             kmeans = KMeans(n_clusters=n_clusters)
