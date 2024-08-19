@@ -223,38 +223,29 @@ def main():
             if not const_epoch and ((monitor_loss(loss_list0) and monitor_loss(loss_list1))):
                 epoch_size = epoch
                 break
+        def RF_Predict(train_x, test_x, train_y,special_id):
+            rf_model = RandomForestRegressor()
+            rf_model.fit(train_x, train_y)
+            rf_result = rf_model.predict(test_x)
+            kkk=[]
+            for id in special_id:
+                kkk.append(rf_result[id])
+            print(kkk)
+        def test_represention():
+            if dec == None:
+                full_x = data.cpu()
+            elif cluster:
+                dec.update()
+                full_x = get_full_cluster(data, dec, device)
+            else:
+                full_x = get_full_encode(data, dec, device)
+        
+            train_x = full_x[train_id]
+            train_y = full_y[train_id]
+        
+            RF_Predict(train_x, full_x, train_y, special_ids)
 
-        def save_test():
-            orig_0_r2, orig_0_mae, orig_0_f1, orig_0_rmse, orig_0_maes, y_orig_0 = test_represention(data = data0, dec = None, full_y = full_y, train_id = train_id, test_id = test_id, cluster = True, special_id = True, device = device)
-            orig_1_r2, orig_1_mae, orig_1_f1, orig_1_rmse, orig_1_maes, y_orig_1 = test_represention(data = data1, dec = None, full_y = full_y, train_id = train_id, test_id = test_id, cluster = True, special_id = True, device = device)
-            encode_0_r2, encode_0_mae, encode_0_f1, encode_0_rmse, encode_0_maes, y_encode_0 = test_represention(data = data0, dec = dec0, full_y = full_y, train_id = train_id,
-                            test_id = test_id, cluster = False, special_id = True, device = device)
-            encode_1_r2, encode_1_mae, encode_1_f1, encode_1_rmse, encode_1_maes, y_encode_1 = test_represention(data = data1, dec = dec1, full_y = full_y, train_id = train_id,
-                            test_id = test_id, cluster = False, special_id = True, device = device)
-            cluster_0_r2, cluster_0_mae, cluster_0_f1, cluster_0_rmse, cluster_0_maes, y_cluster_0 = test_represention(data = data0, dec = dec0, full_y = full_y, train_id = train_id,
-                            test_id = test_id, cluster = True, special_id = True, device = device)
-            cluster_1_r2, cluster_1_mae, cluster_1_f1, cluster_1_rmse, cluster_1_maes, y_cluster_1 = test_represention(data = data1, dec = dec1, full_y = full_y, train_id = train_id,
-                            test_id = test_id, cluster = True, special_id = True, device = device)
-            print(orig_0_r2, orig_0_mae, '\n',
-                orig_1_r2, orig_1_mae, '\n',
-                cluster_0_r2, cluster_0_mae, '\n',
-                cluster_1_r2, cluster_1_mae, '\n',
-                encode_0_r2, encode_0_mae, '\n',
-                encode_1_r2, encode_1_mae, '\n',
-                )
-            with open("./results/r2_noAL.csv","a+") as f:
-                f.write(str(n_clusters) + ',')
-                f.write(str(len(start_id)) + ',')
-                f.write(str(orig_0_r2) + ',')
-                f.write(str(orig_1_r2) + ',')
-                f.write(str(cluster_0_r2) + ',')
-                f.write(str(cluster_1_r2) + ',')
-                f.write(str(encode_0_r2) + ',')
-                f.write(str(encode_1_r2) + ',')
-                f.write(str(epoch_size) + ',')
-                f.write(al_method + '\n')
-
-        save_test()
+        test_represention()
         return None
     
     data0 = torch.tensor(all_low0, dtype=torch.double).to(device)
