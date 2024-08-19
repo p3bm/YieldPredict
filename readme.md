@@ -13,7 +13,8 @@ matplotlib
 ### For Yield Prediction
 1. Prepare an xlsx file of reaction data in SMILES format according to the given style.
 2. Convert the reaction space into a binary npy file (we provide a basic molecular fingerprint conversion script in utils).
-3. Modify the dataset name in main.py and run main.py
+3. Modify the arguments in 'class Arguments' of main.py
+4. run main.py and the prediction result will be represent as "result.csv"
 
 ### For Test
 We prepare BH.py, SM.py and BH_Plus.py for performance test on these three public HTE dataset
