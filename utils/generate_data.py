@@ -40,7 +40,7 @@ def main():
         elif args.representation == 'FCFP':
             flattened_encoding_of_dataset, yields = FCFP.encode_dataset(sheet, num_columns_of_sheet)
         '''
-        np.savez(type + '_' + representation + ".npz"), train_data=flattened_encoding_of_dataset, train_labels=yields)
+        np.savez(type + '_' + representation + ".npz", train_data=flattened_encoding_of_dataset, train_labels=yields)
         print("\n")
 
 if __name__ == "__main__":
