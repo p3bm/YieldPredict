@@ -11,9 +11,9 @@ import mdr_descriptors
 import morgan_fingerprint as mfp
 
 def main():
-    strs = input("xlsx filename")
-    type = input("dataset name")
-    num_columns_of_sheet = int(input("columns num(include yield)"))
+    strs = input("xlsx filename:")
+    type = input("dataset name:")
+    num_columns_of_sheet = int(input("columns num(include yield):"))
     reprs = ["morgan_fp", "Mordred"]
     for representation in reprs:
         print("representation:" + representation)
