@@ -7,8 +7,9 @@ numpy
 sklearn  
 matplotlib  
 
-You can also use our `requirements.txt` to install in python 3.9+
+You can also use our `requirements.txt` to install
 ```
+python==3.9+
 pip install -r requirements.txt
 ```
 
