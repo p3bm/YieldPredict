@@ -248,8 +248,8 @@ def main():
                 for y in rf_result:
                     f.write(str(y) + '\n')
 
-        test_represention(data0,dec0,device,'./0.csv')
-        test_represention(data1,dec1,device,'./1.csv')
+        test_represention(data0,dec0,device,'./result_0.csv')
+        test_represention(data1,dec1,device,'./result_1.csv')
 
         def prob_cover():
             add_id = []
