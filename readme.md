@@ -6,10 +6,11 @@ pytorch
 numpy  
 sklearn  
 matplotlib  
+rdkit  
 
-You can also use our `requirements.txt` to install
+You can also use our `requirements.txt` to install  
+
 ```
-python==3.9+
 pip install -r requirements.txt
 ```
 
