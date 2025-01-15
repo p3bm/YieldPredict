@@ -345,19 +345,21 @@ def main():
                 level = []
                 for center in closest_points:
                     y = full_y [id]
-                    c_y = full_y[center]
-                    if abs(c_y-y) < 0.5 * judge_dis:
-                        level.append(1)
-                    elif abs(c_y-y) < 1 * judge_dis:
-                        level.append(0.75)
-                    elif abs(c_y-y) < 1.5 * judge_dis:
-                        level.append(0.5)
-                    elif abs(c_y-y) < 2 * judge_dis:
-                        level.append(0.25)
-                    elif abs(c_y-y) < 2.5 * judge_dis:
-                        level.append(0.1)
-                    else:
-                        level.append(0.0001)
+                    #c_y = full_y[center]
+                    #if abs(c_y-y) < 0.5 * judge_dis:
+                    #    level.append(1)
+                    #elif abs(c_y-y) < 1 * judge_dis:
+                    #    level.append(0.75)
+                    #elif abs(c_y-y) < 1.5 * judge_dis:
+                    #    level.append(0.5)
+                    #elif abs(c_y-y) < 2 * judge_dis:
+                    #    level.append(0.25)
+                    #elif abs(c_y-y) < 2.5 * judge_dis:
+                    #    level.append(0.1)
+                    #else:
+                    #    level.append(0.0001)
+                    w = max(2 - abs(y-c_y)**2 / 100, 0.0001)
+                    level.append(w)
                 level = torch.tensor(level, dtype = torch.double).to(device)
                 level = level/torch.sum(level)
                 const_q[id] = level
