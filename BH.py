@@ -8,6 +8,7 @@ import numpy as np
 from sklearn.decomposition import TruncatedSVD
 
 from dataset_container import *
+from sampling_methods import *
 import utils
 
 import torch
@@ -210,12 +211,11 @@ def main():
     
 
     pred_array = dict()
-    # encode_array = dict()
     def double_cluster(dec0, dec1, data0, data1, start_id, step_size, n_clusters = 30, epoch_size = 20, dir_name = 'figs', const_epoch = False, al_method = 'prob', lam=1):
         def monitor_loss(loss_list, threshold = 0.015):
-            if len(loss_list) < 120:
+            if len(loss_list) < int(0.4*len(start_id)+30):
                 return False
-            
+
             average_loss = sum(loss_list[-10:]) / len(loss_list[-10:])
             previous_average_loss = sum(loss_list[-20:-10]) / len(loss_list[-20:-10])
             
@@ -650,7 +650,7 @@ def main():
         timestamp = current_time.strftime("%Y%m%d%H%M%S")
         dir_name = f"{timestamp}"
         while len(train_id) < total_size:
-           add_id = double_cluster(dec0, dec1, data0, data1, train_id, step_size, 24, 300, dir_name, al_method=active_method, lam=lam)
+           add_id = double_cluster(dec0, dec1, data0, data1, train_id, step_size, 24, 100, dir_name, al_method=active_method, lam=lam)
            train_id = train_id + add_id
         double_cluster(dec0, dec1, data0, data1, train_id, step_size, 30, 300, dir_name, al_method=active_method, lam=lam)
 
