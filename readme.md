@@ -39,6 +39,20 @@ python BH_Plus.py
 ```
 
 
-### To run the script
-custom_main.py is the file to run
+# 🧪 HTS Project — Reaction Suggestion Workflow
 
+## Overview
+This project helps automate reaction selection for high-throughput screening (HTS).  
+It iteratively suggests new reactions based on existing data and experimental results.
+
+---
+
+## 🚀 How to Run
+
+### 1. Run the main script
+Execute the following command to start the process:
+```bash
+python catsci_main.py
+
+- It will give you next 15 reactions. If you wanna change the number of reactions it suggest go to main main.py and change the step size value.
+- Use the suggested reactions and once you get the actual yield for those reactions combine it with the original data and run the catsci_main.py file again to get next batch of reactions
