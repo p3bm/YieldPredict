@@ -20,7 +20,7 @@ def encode_dataset(sheet, num_columns_of_sheet):
                 smiles = row[j]
                 sss.add(smiles)
         for smile in sss:
-            print(smile)
+            # print(smile)
             if smile == '':
                 encoding_of_smiles = np.zeros(1613)
             else:

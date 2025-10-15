@@ -14,7 +14,7 @@ def encode_dataset(sheet, num_columns_of_sheet, dim_molecule):
 
         for j in range(num_columns_of_sheet-1):
             smiles = row[j]
-            print(smiles)
+            # print(smiles)
             mol = Chem.MolFromSmiles(smiles)
             encoding_of_smiles = np.array(AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=dim_molecule))
             flattened_encoding_of_dataset[row_idx-1, j*dim_molecule:(j+1)*dim_molecule] = encoding_of_smiles

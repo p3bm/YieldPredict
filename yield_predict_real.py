@@ -67,7 +67,7 @@ class DEC(nn.Module):
 
 class Arguments:
     def __init__(self):
-        self.dataset_files = ["./real_6_Mordred_train.npz", "./real_6_morgan_fp_2048_train.npz"] #dataset path of your reaction space
+        self.dataset_files = ["./reaction93/real_6_Mordred_train.npz", "./reaction93/real_6_morgan_fp_2048_train.npz"] #dataset path of your reaction space
         self.split_mode = 0
         self.reduce_method = ['pca','pca']    #Arguments for PCA
         self.pca_components = [4096,4096]    

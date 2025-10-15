@@ -37,3 +37,8 @@ python BH.py
 python SM.py
 python BH_Plus.py
 ```
+
+
+### To run the script
+custom_main.py is the file to run
+

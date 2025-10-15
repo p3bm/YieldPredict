@@ -67,7 +67,7 @@ class DEC(nn.Module):
 
 class Arguments:
     def __init__(self):
-        self.dataset_files = [] #dataset path of your reaction space
+        self.dataset_files = ["./catsci_data/catsci_data_Mordred.npz", "./catsci_data/catsci_data_morgan_fp.npz"] #dataset path of your reaction space
         self.split_mode = 0
         self.reduce_method = ['pca','pca']    #Arguments for PCA
         self.pca_components = [4096,4096]    
@@ -84,6 +84,7 @@ def PCA_reduce(xs, n_components = 72):
 def get_dataset(dataset):
     data_train = np.load(dataset)
     x_train, y_train = data_train["train_data"], data_train["train_labels"]
+    print("y_train: {}".format(y_train))
     return (x_train, y_train)
 
 def monitor_loss(loss_list, threshold = 0.015):
@@ -95,6 +96,7 @@ def monitor_loss(loss_list, threshold = 0.015):
         return True
     return False
 
+# this is added
 def main():
     cuda = torch.cuda.is_available()
     if cuda:
@@ -106,7 +108,7 @@ def main():
 
     args = Arguments()
     dataset_kwargs = dict()
-    
+
     origx_trains = []
     for i in range(len(args.dataset_files)):
         datafile = args.dataset_files[i]
@@ -126,6 +128,7 @@ def main():
         print(orig_x_train.shape)
         origx_trains.append(orig_x_train)
 
+    # print("orig_y_train_unnormalized.shape: {}".format(orig_y_train_unnormalized))
     full_y = orig_y_train_unnormalized
     all_low0 = origx_trains[0]
     all_low1 = origx_trains[1]
@@ -248,8 +251,8 @@ def main():
                 for y in rf_result:
                     f.write(str(y) + '\n')
 
-        test_represention(data0,dec0,device,'./result_0.csv')
-        test_represention(data1,dec1,device,'./result_1.csv')
+        test_represention(data0,dec0,device,'./catsci_data/result_0.csv')
+        test_represention(data1,dec1,device,'./catsci_data/result_1.csv')
 
         def prob_cover():
             add_id = []
@@ -324,11 +327,15 @@ def main():
     train_id = []
     for i in range(len(full_y)):
         if full_y[i] > 0:
+            # print(f"full_y[{i}]: {full_y[i]}")  # 👈 Add this line
             train_id.append(i)
-    step_size = 25
-    recommend_reaction_ids = double_cluster(dec0,dec1,data0,data1,train_id,step_size,30,100)
+    # print(f"Number of training samples in train_id: {len(train_id)}")  # 👈 Add this line
+    step_size = 15
+    recommend_reaction_ids = double_cluster(dec0,dec1,data0,data1,train_id,step_size,5,100)
 
-    print(recommend_reaction_ids)
+    # print(recommend_reaction_ids)
 
-if __name__ == "__main__":
-    main()
+    return recommend_reaction_ids
+
+# if __name__ == "__main__":
+#     main()

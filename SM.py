@@ -24,8 +24,23 @@ from sklearn.model_selection import train_test_split
 from sklearn.gaussian_process.kernels import RBF, Matern
 
 import scipy.stats as stats
+from tqdm import tqdm
 
 class DEC(nn.Module):
+    """
+    Neural network for Deep Embedded Clustering (DEC).
+    This class implements the DEC algorithm, which is used for clustering high-dimensional data.
+    The DEC model consists of an encoder and a decoder, which are used to learn a low-dimensional representation of the input data.
+    The encoder maps the input data to a low-dimensional space, and the decoder reconstructs the input data from the low-dimensional representation.
+    The DEC model also includes a clustering layer that assigns cluster probabilities to the low-dimensional representation of the input data.
+    The model is trained using a combination of reconstruction loss and clustering loss.
+    The clustering loss is computed using the Kullback-Leibler divergence between the predicted cluster probabilities and the target distribution.
+    The target distribution is computed based on the cluster centers and the low-dimensional representation of the input data.
+    
+
+    Args:
+        nn (_type_): _description_
+    """
     def __init__(
         self,
         ori_cluster_centers: torch.Tensor,
@@ -202,6 +217,7 @@ def main():
         loss_list0 = []
 
         for epoch in range(epoch_size):
+        # for epoch in range(epoch_siz
             dec0.update()
             dec1.update()
             total_loss0 = 0
