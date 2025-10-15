@@ -53,6 +53,6 @@ It iteratively suggests new reactions based on existing data and experimental re
 Execute the following command to start the process:
 ```bash
 python catsci_main.py
-
+```
 - It will give you next 15 reactions. If you wanna change the number of reactions it suggest go to main main.py and change the step size value.
 - Use the suggested reactions and once you get the actual yield for those reactions combine it with the original data and run the catsci_main.py file again to get next batch of reactions
