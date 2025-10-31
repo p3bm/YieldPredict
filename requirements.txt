@@ -75,7 +75,6 @@ PyQt5-sip
 pyshp
 PySocks
 python-dateutil
-pytz
 rdkit==2022.3.5
 rdkit-pypi==2022.9.5
 requests
