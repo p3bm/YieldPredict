@@ -180,12 +180,8 @@ if 'last_recommendations' in st.session_state:
         use_container_width=True
     )
 
-    # Save to session for later commit
-    st.session_state['edited_suggested_df'] = edited_df
-
     # Commit updated yields button
     if st.button("Commit updated yields to master dataset"):
-        edited_df = st.session_state.get('edited_suggested_df', None)
         if edited_df is None or edited_df.empty:
             st.warning("No data found to commit.")
         else:
