@@ -50,7 +50,7 @@ outdated==0.2.2
 packaging
 pandas
 parso
-pathtools==0.1.2
+pathtools
 pexpect
 pickleshare
 Pillow==9.2.0
