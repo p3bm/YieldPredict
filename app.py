@@ -193,9 +193,9 @@ if 'last_recommendations' in st.session_state:
             for idx, row in edited_df.iterrows():
                 if 'Yield' in row and pd.notna(row['Yield']) and row['Yield'] >= 0:
                     try:
-                        master_df.loc[master_df['Reaction_ID'] == row['Reaction_ID'], 'Yield'] = float(row['Yield'])
+                        master_df.loc[idx, 'Yield'] = float(row['Yield'])
                     except Exception as e:
-                        st.error(f"Could not update reaction ID {row['Reaction_ID']}: {e}")
+                        st.error(f"Could not update reaction ID {idx}: {e}")
 
             # Save updated master dataset
             master_df.to_excel(MASTER_FILE, index=False)
