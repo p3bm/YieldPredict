@@ -1,21 +1,21 @@
 # Core scientific stack
-numpy>=1.22
-scipy>=1.10
-pandas>=2.0
-scikit-learn>=1.3
+numpy
+scipy
+pandas
+scikit-learn
 
 # Machine learning / modeling
-torch>=2.0
+torch
 
 # Chemical informatics
-rdkit-pypi>=2022.9.5
-mordred>=1.2.0  # only if your data generation uses Mordred descriptors
+rdkit
+mordred
 
 # Excel and I/O
-openpyxl>=3.1
+openpyxl
 
 # Visualization (optional)
-matplotlib>=3.7
+matplotlib
 
 # Streamlit UI
-streamlit>=1.30
+streamlit
