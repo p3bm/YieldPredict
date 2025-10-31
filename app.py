@@ -165,54 +165,45 @@ if run_once:
 if 'last_recommendations' in st.session_state:
     rec_ids = st.session_state['last_recommendations']
     st.subheader(f"Last suggested reactions ({len(rec_ids)})")
+
+    # Get subset of master corresponding to suggested reaction IDs
     suggested_df = get_suggested_df(master_df, rec_ids)
-    st.dataframe(suggested_df)
 
-    # Allow user to edit/enter yields inline
-    st.markdown("### Enter yields for suggested reactions")
-    yield_inputs = {}
-    col1, col2 = st.columns([2,1])
-    with col1:
-        st.write("View and optionally edit reaction values; enter numeric yields for performed experiments.")
-    with col2:
-        st.write("Leave blank if not yet measured.")
+    st.markdown("### Edit and enter yields directly")
+    st.info("You can type or adjust yield values directly in the table below. Leave as -1 if not yet measured.")
 
-    edited_vals = {}
-    for idx, row in suggested_df.iterrows():
-        default_val = row.get('Yield', -1)
-        # Render a number_input for each suggested row
-        val = st.number_input(f"Index {idx}", min_value=-1.0, max_value=100.0, value=float(default_val if pd.notna(default_val) else -1.0), step=1.0, key=f"yield_{idx}")
-        edited_vals[idx] = val
+    # Editable data table
+    edited_df = st.data_editor(
+        suggested_df,
+        key="edited_suggested_df",
+        num_rows="fixed",
+        use_container_width=True
+    )
 
-    st.session_state['edited_yields'] = edited_vals
+    # Save to session for later commit
+    st.session_state['edited_suggested_df'] = edited_df
 
-    if commit_button:
-        # Commit updated yields back to master_df
-        edited = st.session_state.get('edited_yields', {})
-        if not edited:
-            st.warning("No yields entered to commit.")
+    # Commit updated yields button
+    if st.button("Commit updated yields to master dataset"):
+        edited_df = st.session_state.get('edited_suggested_df', None)
+        if edited_df is None or edited_df.empty:
+            st.warning("No data found to commit.")
         else:
-            # Backup master before change
+            # Backup master before making changes
             backup = backup_master(MASTER_FILE)
-            st.info(f"Backup before commit: {backup.name}")
-            for idx, y in edited.items():
-                # Only commit if yield >= 0 (meaning user set a real value)
-                if y is None:
-                    continue
-                try:
-                    yfloat = float(y)
-                except Exception:
-                    continue
-                if yfloat >= 0:
-                    # assign by position (iloc) if index not equal
+            st.info(f"Backup created before commit: {backup.name}")
+
+            # Update yields in master_df where reaction IDs match
+            for idx, row in edited_df.iterrows():
+                if 'Yield' in row and pd.notna(row['Yield']) and row['Yield'] >= 0:
                     try:
-                        master_df.loc[idx, 'Yield'] = yfloat
-                    except Exception:
-                        # fallback to iloc if idx is not label
-                        master_df.iloc[idx, master_df.columns.get_loc('Yield')] = yfloat
-            # Save master
+                        master_df.loc[master_df['Reaction_ID'] == row['Reaction_ID'], 'Yield'] = float(row['Yield'])
+                    except Exception as e:
+                        st.error(f"Could not update reaction ID {row['Reaction_ID']}: {e}")
+
+            # Save updated master dataset
             master_df.to_excel(MASTER_FILE, index=False)
-            st.success("Committed yields to master Excel. You can re-run 'Suggest next batch' to continue the loop.")
+            st.success("Updated yields have been committed to the master Excel file. You can now re-run 'Suggest next batch' to continue the loop.")
 
 # Download latest suggested as Excel
 if download_suggested and 'last_recommendations' in st.session_state:
@@ -222,25 +213,4 @@ if download_suggested and 'last_recommendations' in st.session_state:
     with open(SUGGESTED_OUTPUT, 'rb') as f:
         st.download_button("Download suggested reactions (xlsx)", f, file_name="suggested_reactions.xlsx")
 
-# Small status / housekeeping
-st.markdown("---")
-st.write("Model intermediate outputs (if present):")
-cols = st.columns(2)
-with cols[0]:
-    if RESULT_0.exists():
-        st.write(f"{RESULT_0.name} exists")
-        if st.button("Show result_0.csv"):
-            df0 = pd.read_csv(RESULT_0, header=None)
-            st.dataframe(df0.head(20))
-    else:
-        st.write("result_0.csv not present yet")
-with cols[1]:
-    if RESULT_1.exists():
-        st.write(f"{RESULT_1.name} exists")
-        if st.button("Show result_1.csv"):
-            df1 = pd.read_csv(RESULT_1, header=None)
-            st.dataframe(df1.head(20))
-    else:
-        st.write("result_1.csv not present yet")
-
-st.caption("Note: this interface runs the compute synchronously. Large datasets and DEC training may take time to complete.")
+st.caption("Note: this interface runs the compute synchronously. Large datasets and DEC training may take a long time to complete.")
