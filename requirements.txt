@@ -52,7 +52,7 @@ pandas
 parso
 pexpect
 pickleshare
-Pillow==9.2.0
+Pillow
 ply==3.11
 promise==2.3
 prompt-toolkit
