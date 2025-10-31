@@ -12,6 +12,7 @@ rdkit
 mordred
 
 # Excel and I/O
+xlrd2
 openpyxl
 
 # Visualization (optional)
