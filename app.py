@@ -160,7 +160,6 @@ if run_once:
         st.warning(f"Model returned {len(recommended)} suggestions; you requested {batch_size}.")
 
     st.session_state['last_recommendations'] = recommended
-    st.experimental_rerun()
 
 # Show last suggestions if present
 if 'last_recommendations' in st.session_state:
