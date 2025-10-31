@@ -1,5 +1,5 @@
 # Core scientific stack
-numpy
+numpy>=1.22
 scipy
 pandas
 scikit-learn
@@ -9,7 +9,7 @@ torch
 
 # Chemical informatics
 rdkit
-mordred
+mordred>=1.2.0 
 
 # Excel and I/O
 xlrd2
